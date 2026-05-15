@@ -109,8 +109,9 @@ export class SerialBridge {
   }
 
   async queryInfo(): Promise<ESP32Status> {
-    const resp = await this.sendAndWait('INFO');
-    return this.parseStatus(resp);
+    await this.sendAndWait('INFO');
+    await new Promise((r) => setTimeout(r, 200));
+    return this.getStatus();
   }
 
   async setMode(mode: 'immediate' | 'sequence'): Promise<void> {

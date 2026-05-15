@@ -75,6 +75,7 @@ void printInfo() {
                   currentMode == OpMode::IMMEDIATE ? "immediate" : "sequence",
                   seqBuffer.size(), SEQ_CAPACITY);
     transport.printStatus(Serial);
+    Serial.printf("STATUS ready\n");
 }
 
 void setup() {
