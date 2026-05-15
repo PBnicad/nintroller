@@ -26,7 +26,13 @@ pnpm add -g nintroller
 
 ## AI 使用
 
-项目内置 [SKILL.md](./SKILL.md)，AI Agent 加载后可通过 CLI 直接操控 Switch。所有命令支持 `--json` 输出和标准化退出码，适合脚本与 Agent 消费：
+项目内置skills，AI Agent 加载后可通过 CLI 直接操控 Switch。所有命令支持 `--json` 输出和标准化退出码，适合脚本与 Agent 消费：
+
+使用如下命令安装skills
+```
+npx skills add https://github.com/PBnicad/nintroller 
+``` 
+
 
 ```bash
 nintroller connect COM3 --json
