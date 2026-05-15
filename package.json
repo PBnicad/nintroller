@@ -9,7 +9,8 @@
     "nintroller": "dist/cli.js"
   },
   "files": [
-    "dist/"
+    "dist/",
+    ".opencode/skills/nintroller/SKILL.md"
   ],
   "engines": {
     "node": ">=18"

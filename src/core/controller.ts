@@ -61,6 +61,10 @@ export class Controller implements ControllerAPI {
     await this.bridge.sequenceClear();
   }
 
+  async pair(): Promise<void> {
+    await this.bridge.pair();
+  }
+
   async getStatus(): Promise<ESP32Status> {
     return await this.bridge.queryInfo();
   }

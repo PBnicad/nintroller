@@ -258,6 +258,22 @@ program
     }
   });
 
+// ── pair ─────────────────────────────────────────────────
+program
+  .command('pair')
+  .description('Enter Bluetooth pairing mode (forgets previous pairings)')
+  .action(async () => {
+    const opts = program.opts() as GlobalOptions;
+    try {
+      const ctrl = getController();
+      await ctrl.pair();
+      output({ success: true, message: 'Pairing mode entered. Go to Switch Settings → Controllers → Change Grip/Order' }, opts);
+    } catch (err: any) {
+      outputError(err.message, opts);
+      process.exit(4);
+    }
+  });
+
 // ── seq ──────────────────────────────────────────────────
 const seqCmd = program.command('seq').description('Sequence operations');
 

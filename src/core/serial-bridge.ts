@@ -133,6 +133,10 @@ export class SerialBridge {
     this.seqSize = 0;
   }
 
+  async pair(): Promise<void> {
+    await this.sendAndWait('PAIR', 30000);
+  }
+
   getStatus(): ESP32Status {
     return {
       connected: this.isConnected,

@@ -24,11 +24,26 @@ pnpm add -g nintroller
 
 前置条件：Node.js >= 18，ESP32-S3 需刷入 `firmware/` 固件。
 
+## AI 使用
+
+项目内置 [SKILL.md](./SKILL.md)，AI Agent 加载后可通过 CLI 直接操控 Switch。所有命令支持 `--json` 输出和标准化退出码，适合脚本与 Agent 消费：
+
+```bash
+nintroller connect COM3 --json
+nintroller btn A --json
+nintroller status --json
+# → {"connected":true,"mode":"immediate","btConnected":true}
+```
+
 ## CLI 命令
 
 ```bash
 # 连接
 nintroller connect <COM口>
+
+# 配对（首次使用）
+nintroller pair
+# → 然后在 Switch 上：系统设置 → 控制器 → 更改握法/顺序
 
 # 按键
 nintroller btn A [duration]        # 按下 (默认100ms)

@@ -62,6 +62,7 @@ export interface ControllerAPI {
   playSequence(): Promise<void>;
   clearSequence(): Promise<void>;
 
+  pair(): Promise<void>;
   getStatus(): Promise<ESP32Status>;
   sendRaw(command: string): Promise<string>;
 }

@@ -122,6 +122,15 @@ export async function startServer(port: number, api: ControllerAPI): Promise<Ser
     }
   });
 
+  app.post('/api/pair', async (_req, res) => {
+    try {
+      await api.pair();
+      res.json({ success: true, message: 'Pairing mode entered' });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
   app.get('/api/plugin', (_req, res) => {
     const plugins = pluginManager.getLoadedPlugins().map((p) => ({
       name: p.name,

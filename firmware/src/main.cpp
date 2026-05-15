@@ -119,6 +119,19 @@ void loop() {
         Serial.println("OK");
         return;
     }
+    if (line == "PAIR") {
+        if (!transport.clearStoredPeer()) {
+            Serial.println("ERR bt clear peer failed");
+            return;
+        }
+        if (!transport.resetConnection(false)) {
+            Serial.println("ERR bt pair reset failed");
+            return;
+        }
+        Serial.printf(
+            "OK pairing mode entered — put Switch in Change Grip/Order screen\n");
+        return;
+    }
 
     if (currentMode == OpMode::SEQUENCE) {
         if (line == "SEQ BEGIN") {
