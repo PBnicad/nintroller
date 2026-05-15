@@ -61,8 +61,15 @@ nintroller stick R 0 1 200
 nintroller seq play                # 回放
 
 # 系统
+nintroller pair                    # 进入配对模式
 nintroller status                  # 查看状态
 nintroller disconnect              # 断开连接
+
+# 交互式 REPL
+nintroller repl COM3               # 连接后逐条输入命令
+# nintroller> btn A
+# nintroller> stick L 1 0 500
+# nintroller> exit
 
 # 插件
 nintroller plugin list             # 已加载插件

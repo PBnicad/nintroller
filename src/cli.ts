@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+import { readFileSync } from 'fs';
+import { createInterface } from 'readline';
 import { Command } from 'commander';
 import { SerialBridge } from './core/serial-bridge';
 import { Controller } from './core/controller';
@@ -95,6 +97,126 @@ program
       outputError(err.message, program.opts() as GlobalOptions);
       process.exit(2);
     }
+  });
+
+// ── repl ─────────────────────────────────────────────────
+program
+  .command('repl <port>')
+  .description('Interactive REPL mode — connect and send commands interactively')
+  .action(async (port: string) => {
+    const ctrl = getController();
+    try {
+      await ctrl.getBridge().connect(port);
+      console.log(`Connected to ${port}. Type commands, "exit" to quit.`);
+      console.log('Commands: btn <key> [ms], hold <key> <ms>, tap <key> <n>, stick <L|R> <x> <y> [ms], wait <ms>');
+      console.log('         pair, mode <immediate|sequence>, seq begin|play|clear, status');
+      console.log('');
+    } catch (err: any) {
+      console.error(`Connect failed: ${err.message}`);
+      process.exit(2);
+    }
+
+    const rl = createInterface({ input: process.stdin, output: process.stdout, prompt: 'nintroller> ' });
+    rl.prompt();
+
+    const run = async (line: string): Promise<string> => {
+      const parts = line.trim().split(/\s+/);
+      if (parts.length === 0 || parts[0] === '') return '';
+      const cmd = parts[0].toLowerCase();
+
+      try {
+        switch (cmd) {
+          case 'exit':
+          case 'quit':
+            rl.close();
+            await ctrl.getBridge().disconnect();
+            console.log('Disconnected.');
+            process.exit(0);
+          case 'status': {
+            const s = await ctrl.getStatus();
+            return JSON.stringify(s);
+          }
+          case 'pair': {
+            await ctrl.pair();
+            return 'Pairing mode entered. Go to Switch Settings > Controllers > Change Grip/Order';
+          }
+          case 'mode': {
+            if (parts[1] !== 'immediate' && parts[1] !== 'sequence') return 'mode must be immediate or sequence';
+            await ctrl.getBridge().setMode(parts[1] as 'immediate' | 'sequence');
+            return `Mode: ${parts[1]}`;
+          }
+          case 'seq': {
+            if (parts[1] === 'begin') { await ctrl.beginSequence(); return 'Sequence recording started'; }
+            if (parts[1] === 'play') { await ctrl.playSequence(); return 'Sequence played'; }
+            if (parts[1] === 'clear') { await ctrl.clearSequence(); return 'Sequence cleared'; }
+            return 'seq: begin | play | clear';
+          }
+          case 'btn': {
+            if (!parts[1]) return 'btn: missing button name';
+            const btn = parts[1].toUpperCase() as Button;
+            if (!BUTTONS.includes(btn)) return `unknown button: ${parts[1]}`;
+            const dur = parts[2] ? parseInt(parts[2], 10) : 100;
+            await ctrl.pressButton(btn, dur);
+            return `BTN ${btn} ${dur} OK`;
+          }
+          case 'hold': {
+            if (!parts[1] || !parts[2]) return 'hold: <button> <ms>';
+            const btn = parts[1].toUpperCase() as Button;
+            if (!BUTTONS.includes(btn)) return `unknown button: ${parts[1]}`;
+            const dur = parseInt(parts[2], 10);
+            await ctrl.holdButton(btn, dur);
+            return `HOLD ${btn} ${dur} OK`;
+          }
+          case 'tap': {
+            if (!parts[1] || !parts[2]) return 'tap: <button> <count>';
+            const btn = parts[1].toUpperCase() as Button;
+            if (!BUTTONS.includes(btn)) return `unknown button: ${parts[1]}`;
+            const cnt = parseInt(parts[2], 10);
+            await ctrl.tapButton(btn, cnt);
+            return `TAP ${btn} ${cnt} OK`;
+          }
+          case 'stick': {
+            if (!parts[1] || !parts[2] || !parts[3]) return 'stick: <L|R> <x> <y> [ms]';
+            const side = parts[1].toUpperCase() as 'L' | 'R';
+            if (side !== 'L' && side !== 'R') return 'stick: side must be L or R';
+            const x = parseInt(parts[2], 10);
+            const y = parseInt(parts[3], 10);
+            const dur = parts[4] ? parseInt(parts[4], 10) : 200;
+            await ctrl.moveStick(side, x, y, dur);
+            return `STICK ${side} ${x} ${y} ${dur} OK`;
+          }
+          case 'wait': {
+            if (!parts[1]) return 'wait: <ms>';
+            const ms = parseInt(parts[1], 10);
+            await ctrl.wait(ms);
+            return `WAIT ${ms} OK`;
+          }
+          case 'send': {
+            const raw = parts.slice(1).join(' ');
+            const res = await ctrl.sendRaw(raw);
+            return res;
+          }
+          case 'help':
+            return 'btn <key> [ms] | hold <key> <ms> | tap <key> <n> | stick <L|R> <x> <y> [ms] | wait <ms> | pair | mode <immediate|sequence> | seq begin|play|clear | status | send <raw> | exit';
+          case '':
+            return '';
+          default:
+            return `unknown command: ${cmd} (type help)`;
+        }
+      } catch (err: any) {
+        return `ERROR: ${err.message}`;
+      }
+    };
+
+    rl.on('line', async (line) => {
+      const result = await run(line);
+      if (result) console.log(result);
+      rl.prompt();
+    });
+
+    rl.on('close', () => {
+      ctrl.getBridge().disconnect().catch(() => {});
+    });
   });
 
 // ── disconnect ───────────────────────────────────────────
