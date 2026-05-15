@@ -17,7 +17,7 @@ constexpr uint16_t SEQ_CAPACITY = 1024;
 
 // ── Firmware identity ───────────────────────────────────
 constexpr char FIRMWARE_NAME[] = "nintroller";
-constexpr char FIRMWARE_VERSION[] = "0.1.0";
+constexpr char FIRMWARE_VERSION[] = "0.2.0";
 constexpr char BOARD_FAMILY[] = "esp32-s3";
 
 // ── Bluetooth identity (Nintendo Pro Controller) ────────

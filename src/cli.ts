@@ -61,14 +61,38 @@ program
 program
   .command('connect <port>')
   .description('Connect to ESP32 on serial port')
-  .action(async (port: string, opts: GlobalOptions) => {
+  .option('--pair', 'enter pairing mode after connecting')
+  .action(async (port: string, options: { pair?: boolean }) => {
     try {
       const ctrl = getController();
       await ctrl.getBridge().connect(port);
+      if (options.pair) {
+        await ctrl.pair();
+        output({ success: true, port, status: { connected: true, port, mode: 'immediate' as const, btConnected: false }, message: 'Pairing mode entered. Switch should discover Pro Controller...' }, program.opts() as GlobalOptions);
+
+        // wait for Switch to connect, then send A to confirm
+        const started = Date.now();
+        let paired = false;
+        while (Date.now() - started < 15000) {
+          await new Promise((r) => setTimeout(r, 1000));
+          const s = await ctrl.getStatus();
+          if (s.btConnected) {
+            paired = true;
+            break;
+          }
+        }
+        if (paired) {
+          await ctrl.pressButton('A', 100);
+          output({ success: true, paired: true, message: 'Connected and confirmed with A' }, program.opts() as GlobalOptions);
+        } else {
+          output({ success: true, paired: false, message: 'No Switch connection detected within 15s. Pairing mode still active.' }, program.opts() as GlobalOptions);
+        }
+        return;
+      }
       const status = await ctrl.getStatus();
-      output({ success: true, port, status }, opts);
+      output({ success: true, port, status }, program.opts() as GlobalOptions);
     } catch (err: any) {
-      outputError(err.message, opts);
+      outputError(err.message, program.opts() as GlobalOptions);
       process.exit(2);
     }
   });

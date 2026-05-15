@@ -128,8 +128,15 @@ void loop() {
             Serial.println("ERR bt pair reset failed");
             return;
         }
-        Serial.printf(
-            "OK pairing mode entered — put Switch in Change Grip/Order screen\n");
+        uint32_t started = millis();
+        while (!transport.isDiscoverable()) {
+            if (millis() - started > 10000) {
+                Serial.println("ERR bt pair timeout - not discoverable");
+                return;
+            }
+            delay(50);
+        }
+        Serial.printf("OK pairing mode entered — put Switch in Change Grip/Order screen\n");
         return;
     }
 

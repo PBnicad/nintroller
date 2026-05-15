@@ -4,7 +4,7 @@ description: Nintendo Switch automation via CLI — press buttons, move sticks, 
 license: GPL-3.0-or-later
 compatibility: opencode
 metadata:
-  repository: https://github.com/zhouxiyu1997/nintroller
+  repository: https://github.com/pbnicad/nintroller
   npm: nintroller
 ---
 # Nintroller Skill — AI 操控 Nintendo Switch

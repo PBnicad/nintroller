@@ -75,6 +75,7 @@ class ControllerTransport {
   virtual bool moveDirection(int x, int y, uint16_t holdMs, uint16_t settleMs) = 0;
   virtual bool resetConnection(bool reconnectLastPeer = false) = 0;
   virtual bool clearStoredPeer() = 0;
+  virtual bool isDiscoverable() const = 0;
   virtual void printStatus(Print &output) const = 0;
   virtual const char *name() const = 0;
 

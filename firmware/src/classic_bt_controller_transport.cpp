@@ -72,7 +72,7 @@ constexpr bool kWaitForExplicitInputDrain = false;
 constexpr bool kMarkPairedOnSubcommand03 = false;
 constexpr bool kSuppressRoutineCongestionWarnings = false;
 constexpr bool kDisableBluetoothModemSleep = false;
-constexpr bool kAttemptVirtualCableOnAuthComplete = false;
+constexpr bool kAttemptVirtualCableOnAuthComplete = true;
 constexpr uint16_t kIdlePrePairingReportIntervalMs = 30;
 constexpr uint16_t kIdleCongestedReportIntervalMs = 45;
 constexpr uint16_t kIdleConnectedReportIntervalMs = 15;
@@ -781,6 +781,10 @@ bool ClassicBtControllerTransport::clearStoredPeer() {
   }
 
   return true;
+}
+
+bool ClassicBtControllerTransport::isDiscoverable() const {
+  return discoverable_;
 }
 
 bool ClassicBtControllerTransport::clearBondedPeerDevices() {
@@ -1737,6 +1741,7 @@ bool ClassicBtControllerTransport::repeatCurrentInputReport(uint16_t durationMs,
 void ClassicBtControllerTransport::resetInputReportTracking() {}
 bool ClassicBtControllerTransport::clearBondedPeerDevices() { return false; }
 bool ClassicBtControllerTransport::clearPersistedPeerAddress() { return false; }
+bool ClassicBtControllerTransport::isDiscoverable() const { return false; }
 void ClassicBtControllerTransport::markControllerPaired() {}
 bool ClassicBtControllerTransport::sendSubcommandReply(
     uint8_t reportId, const uint8_t *data, size_t length, const char *label) {

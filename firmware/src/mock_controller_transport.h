@@ -9,6 +9,7 @@ class MockControllerTransport : public ControllerTransport {
   bool moveDirection(int x, int y, uint16_t holdMs, uint16_t settleMs) override;
   bool resetConnection(bool reconnectLastPeer = false) override;
   bool clearStoredPeer() override;
+  bool isDiscoverable() const override;
   void printStatus(Print &output) const override;
   const char *name() const override;
 };

@@ -6,4 +6,5 @@ dist/
 .DS_Store
 Thumbs.db
 *.tsbuildinfo
-.opencode/
+.opencode/node_modules/
+.opencode/package-lock.json

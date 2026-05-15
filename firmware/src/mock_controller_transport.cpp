@@ -28,6 +28,8 @@ bool MockControllerTransport::resetConnection(bool reconnectLastPeer) {
 
 bool MockControllerTransport::clearStoredPeer() { return true; }
 
+bool MockControllerTransport::isDiscoverable() const { return false; }
+
 void MockControllerTransport::printStatus(Print &output) const {
   output.print("INFO transport=");
   output.println(name());
