@@ -2,7 +2,7 @@
   "name": "nintroller",
   "version": "0.1.0",
   "description": "Nintendo Switch automation middleware platform",
-  "license": "MIT",
+  "license": "GPL-3.0-or-later",
   "keywords": ["nintendo-switch", "automation", "bluetooth", "controller", "esp32"],
   "main": "dist/cli.js",
   "bin": {

@@ -164,6 +164,15 @@ export default class MyPlugin implements INintrollerPlugin {
 | 上位机 | TypeScript, Node.js, commander, serialport |
 | Web GUI | React, TypeScript, Vite, Express |
 
+## 致谢
+
+本项目的 ESP32 固件蓝牙 HID 实现（`firmware/src/classic_bt_controller_transport.*`）参考了 **[Friend Maker](https://github.com/zhouxiyu1997/friendmaker)** 的 Switch Pro Controller 蓝牙模拟代码。
+
+- **Friend Maker** 作者：[惜羽拓麻镇](https://github.com/zhouxiyu1997)（小红书同名）
+- Friend Maker 蓝牙链路的思路与代码路径源自 **UARTSwitchCon**
+
+感谢他们的开源贡献。
+
 ## License
 
-MIT
+[GPL-3.0-or-later](https://www.gnu.org/licenses/gpl-3.0.html) — 由于固件中包含 Friend Maker / UARTSwitchCon 的 GPL 衍生代码，本项目整体使用 GPL-3.0 保持许可证一致。
