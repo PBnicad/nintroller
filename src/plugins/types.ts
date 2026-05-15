@@ -63,6 +63,7 @@ export interface ControllerAPI {
   clearSequence(): Promise<void>;
 
   pair(): Promise<void>;
+  pressCombo(buttons: Button[], durationMs?: number): Promise<void>;
   getStatus(): Promise<ESP32Status>;
   sendRaw(command: string): Promise<string>;
 }

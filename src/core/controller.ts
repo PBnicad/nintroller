@@ -65,6 +65,10 @@ export class Controller implements ControllerAPI {
     await this.bridge.pair();
   }
 
+  async pressCombo(buttons: Button[], durationMs = 100): Promise<void> {
+    await this.bridge.sendCombo(buttons, durationMs);
+  }
+
   async getStatus(): Promise<ESP32Status> {
     return await this.bridge.queryInfo();
   }

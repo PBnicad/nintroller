@@ -138,6 +138,10 @@ export class SerialBridge {
     await this.sendAndWait('PAIR', 30000);
   }
 
+  async sendCombo(buttons: string[], durationMs: number): Promise<void> {
+    await this.sendAndWait(`COMBO ${buttons.join('+')} ${durationMs}`);
+  }
+
   getStatus(): ESP32Status {
     return {
       connected: this.isConnected,

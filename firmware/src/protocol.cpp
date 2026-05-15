@@ -160,11 +160,71 @@ bool parseWaitCommand(const String &line, SeqCmd &cmd, String &error) {
     return true;
 }
 
+bool parseComboCommand(const String &line, SeqCmd &cmd, String &error) {
+    if (!line.startsWith("COMBO ")) return false;
+    const int s1 = line.indexOf(' ');
+    if (s1 < 0) {
+        error = "COMBO requires buttons and duration";
+        return false;
+    }
+    int s2 = line.indexOf(' ', s1 + 1);
+    String btnStr;
+    if (s2 < 0) {
+        btnStr = line.substring(s1 + 1);
+    } else {
+        btnStr = line.substring(s1 + 1, s2);
+    }
+    if (btnStr.length() == 0) {
+        error = "COMBO requires button names separated by +";
+        return false;
+    }
+
+    uint32_t mask = 0;
+    int start = 0;
+    while (start < btnStr.length()) {
+        int sep = btnStr.indexOf('+', start);
+        if (sep < 0) sep = btnStr.length();
+        String name = btnStr.substring(start, sep);
+        name.trim();
+        if (name.length() > 0) {
+            bool ok = false;
+            ControllerButton btn = parseButton(name, ok);
+            if (!ok) {
+                error = "unknown button in combo: " + name;
+                return false;
+            }
+            mask |= controllerButtonMask(btn);
+        }
+        start = sep + 1;
+    }
+    if (mask == 0) {
+        error = "no valid buttons in combo";
+        return false;
+    }
+
+    uint16_t dur = BUTTON_PRESS_DURATION_MS;
+    if (s2 >= 0) {
+        int parsed = line.substring(s2 + 1).toInt();
+        if (parsed < 0 || parsed > 60000) {
+            error = "invalid duration";
+            return false;
+        }
+        dur = static_cast<uint16_t>(parsed);
+    }
+    cmd.type = SeqCmdType::BTN;
+    cmd.buttonsMask = mask;
+    cmd.duration = dur;
+    cmd.stickX = 0;
+    cmd.stickY = 0;
+    return true;
+}
+
 }  // namespace
 
 bool parseCommand(const String &line, SeqCmd &cmd, String &error) {
     if (line.startsWith("BTN ")) return parseBtnCommand(line, cmd, error);
     if (line.startsWith("HOLD ")) return parseHoldCommand(line, cmd, error);
+    if (line.startsWith("COMBO ")) return parseComboCommand(line, cmd, error);
     if (line.startsWith("STICK ")) return parseStickCommand(line, cmd, error);
     if (line.startsWith("WAIT ")) return parseWaitCommand(line, cmd, error);
     error = "unknown command";

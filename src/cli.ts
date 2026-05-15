@@ -196,8 +196,18 @@ program
             const res = await ctrl.sendRaw(raw);
             return res;
           }
+          case 'combo': {
+            if (!parts[1]) return 'combo: <btn1+btn2+...> [ms]';
+            const btnList = parts[1].toUpperCase().split('+').map((b: string) => b.trim()) as Button[];
+            for (const b of btnList) {
+              if (!BUTTONS.includes(b)) return `unknown button in combo: ${b}`;
+            }
+            const dur = parts[2] ? parseInt(parts[2], 10) : 100;
+            await ctrl.pressCombo(btnList, dur);
+            return `COMBO ${btnList.join('+')} ${dur} OK`;
+          }
           case 'help':
-            return 'btn <key> [ms] | hold <key> <ms> | tap <key> <n> | stick <L|R> <x> <y> [ms] | wait <ms> | pair | mode <immediate|sequence> | seq begin|play|clear | status | send <raw> | exit';
+            return 'btn <key> [ms] | hold <key> <ms> | tap <key> <n> | combo <k1+k2+...> [ms] | stick <L|R> <x> <y> [ms] | wait <ms> | pair | mode <immediate|sequence> | seq begin|play|clear | status | send <raw> | exit';
           case '':
             return '';
           default:
@@ -398,6 +408,30 @@ program
         await ctrl.getBridge().setMode('immediate');
       }
       output({ success: true, mode: m }, opts);
+    } catch (err: any) {
+      outputError(err.message, opts);
+      process.exit(4);
+    }
+  });
+
+// ── combo ──────────────────────────────────────────────────
+program
+  .command('combo <buttons> [duration]')
+  .description('Press multiple buttons simultaneously (e.g. A+B, ZL+ZR)')
+  .action(async (buttons: string, duration: string | undefined) => {
+    const opts = program.opts() as GlobalOptions;
+    try {
+      const ctrl = getController();
+      const btnList = buttons.toUpperCase().split('+').map((b: string) => b.trim()) as Button[];
+      for (const b of btnList) {
+        if (!BUTTONS.includes(b)) {
+          outputError(`unknown button in combo: ${b}`, opts);
+          process.exit(1);
+        }
+      }
+      const dur = duration ? parseInt(duration, 10) : 100;
+      await ctrl.pressCombo(btnList, dur);
+      output({ success: true, command: `COMBO ${btnList.join('+')} ${dur}` }, opts);
     } catch (err: any) {
       outputError(err.message, opts);
       process.exit(4);
